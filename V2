@@ -1,0 +1,43 @@
+#include "thingProperties.h"
+
+const char* FIRMWARE_VERSION = "2.0.0";
+unsigned long lastCounterMillis = 0;
+const unsigned long counterInterval = 5000;
+
+void setup() {
+  Serial.begin(115200);
+  delay(1500);
+  initProperties();
+  ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+  setDebugMessageLevel(2);
+  ArduinoCloud.printDebugInfo();
+  firmwareVersionCloud = FIRMWARE_VERSION;
+  deviceStatus = "V2 Online - OTA OK";
+  Serial.println("Firmware V2 - boot selesai setelah OTA");
+}
+
+void loop() {
+  ArduinoCloud.update();
+  updateCounterV2();
+  readSensorDummy();
+}
+
+void readSensorDummy() {
+  smokeLevel = random(200, 800);
+}
+
+void updateCounterV2() {
+  if (millis() - lastCounterMillis >= counterInterval) {
+    otaCounter++;
+    lastCounterMillis = millis();
+    deviceStatus = "V2 Online - tick " + String(otaCounter);
+    Serial.print("V2 tick: ");
+    Serial.println(otaCounter);
+  }
+}
+
+void onLedStateChange() {}
+void onDeviceStatusChange() {}
+void onFirmwareVersionCloudChange() {}
+void onOtaCounterChange() {}
+void onSmokeLevelChange() {}
